@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic Image Collage</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .collage {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 10px;
+      max-width: 1200px;
+    }
+
+    .collage img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease;
+    }
+
+    .collage img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="collage" id="collage"></div>
+
+  <script>
+    // List of original small URLs (ending in /60.jpg)
+    const urls = [
+    "https://storage.googleapis.com/images.pricecharting.com/wvulrwkgfps34roz/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/r6adn2pfxnwkbvt3/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/c39f90a8a30698f6e4b4a0da19c4c4472907a17bec6ff1e370bc693e31ebbd2a/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/7366fb520378e5670162355b26cddd4f24a096157734ba1a6a8f21d658e71066/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/pmao4pzdelrqetcr/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/e68ebe63748bb02dfd0f4e70777547b7d99c1857b77014aed4c369d226942da8/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/fdkzzledxhji57go/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2k47cume32rrtjdp/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/87a17da914156f967b710ce2ae8c8e50e7776054df68ba48828a351dbb9b28ac/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3874eafb1668ec96a5359d803d6fc3203c2918234f39e679591cd20837f17cc1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/d07744feeaf363aef9168c3afd00b1d2cc5c401018c383a0c7d4235a8099693c/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b288bb77eccf273692d77434eefe976389557756b7c346438890cb34ba6a5af0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/zc2i3qivbyg6u3go/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/bf1815f305d71efd06400c64c4317ae7e9a38c06ff5aedd253396a18b36ad3d7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/7f5a73ae1b86028a880208648facf9697fe87fda82d1fffb73f58a959ff40257/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5122b59bf6461d7a34fce34aa6476e8b349a742c17efdfb002a72293362322e9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ial7gcbhnvqaarnq/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/gkjfupnvk4aombaw/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/yr5yllebg5h4zyc5/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5e96704258cea7c698de7602006f71dfe88d868c0c9585a1e11055de7d488007/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ib7e5eahy27mc25v/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/8c90f9bd981a43859f84d8834f9c1bbee8ceb646943f78cf0cd02824a974ac1d/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2n4euhza7e2rl6ux/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ddavdw7k2rcj5c57/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5g35k6qwmcs2e5zu/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/49dbf2a0cabb23fb293dde3ed7536fdb956f959e4800dbcb7a24f248acb19a5f/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/6d68187a7f021c56599268b36dcc0da2a916cdc495c63fac32795a2237ecd0e8/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/nu6mlfz4knn7uwl7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/hfpdknookranpgr5/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/d3ad1ffd42faae516fde43b4444a9bb56d59a1ee44dc18614130e71bfb0f5625/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/czgol6k7tonvklqi/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/97e87b1a823a71b36ffe3f6611a73c802688cf7a57be43f1d67ad3533ce10cfe/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/e8b03fb0a68d7eebdcb4973d05d386691957381c1599bb11e2de512f36d75e23/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cbbdc6514d5dc40e113d7ac2585a40c4a1bcf530a96defd89f9e3030b6d161d6/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4ef4f1528983a493497b79910f130a551590fd77f3baf490d02ab59ce6880bb6/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/mjcnzw7kl56q4srl/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ezrjx34ialrh4ltj/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/lolpggjyb7lkkt3a/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4e77d99c35be4f000b3d3235d469a592fc683ce82fb2bb6c469a81f667ec670f/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/7a88977f860166c11eb85236f6b7cd9310d09e7bbf64a07c1a3423cd8d49f487/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/14ca7f805a50a436d1e27c89d54f969f688d4a086a3c6563946310fbdb0e1b78/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a5kgluzasqscrp5q/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/24b605b35814066fe7cd4f03dbf804bc519e64571060b97e0319d2b954430ec6/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/534577ad65db5dc9048d401134c53a2594d795a1bd2d667fc83785824120f636/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ed390ac20b9a452c2dd01f9a5318447cf4bc1f4aa8654e7de0f1619e120e10d9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/52f0cb7754ab042e5b1206cd05620e562208dab592ec6d65b60e628c26c737c1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/870a2da4a4faa706fc8266c92dae55b1518b4975c006499ffaccabec9437d055/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2f37c729f4ae91cb0c9013f9549d8a53096e707be680dcc9b4a3d99c89e60836/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/l5wcclv5wci4fd4w/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/f5c82b27719c707a90324615f7ba3ba42d19c50c6c3efd3e1285281bc3801ea9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ca64b7001872721e01bf2dce26ba63aab21c23046a8117c211c1304f7b55e103/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/qkni2hh6nn7s2du3/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4c4muvlabcukcqrm/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/732ce6e9b1b7e2e5ab93645be0ca7f3217a7b9d2cba666b3fd28885f9b689f98/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b4253710ee077b36198a6ad560b53302d045026a06588c8aa0b24012ecbc5872/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/i6pwx3xsugi4jdgh/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a804d81dbb8415153de303b099d6a9ceb96cd05399391cc0389682133ac70c59/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/91dea5e9f7673507d2297eb9388235fb10562efcea66aeb083a65cbd16756607/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/6d7328829e25d05d105c67a8a1375f495f53bf5dba22260198671ff1f674c223/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/6c95b4b314fbea46536926da02fe303d97368294ba654c47072a4f8a2dc816e9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a6f716145c0e1672a75fbe58afe4ac7a4b521a5df3f653921b7bf6595876d2b2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/iydsh52ydifo3til/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3f45d4e4712c18832943ab4587ebdeb16ed4702875f7ee21f0448b7ceabfd9c4/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/mmk2lnwuxgqjhxp7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/93f2594c7ce6b77f5bd8aa458c409c831a7bbf96fe028c8017e121adcfc303fa/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/sbrlvx4vftkzcjqj/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ab6950121405a4449775da793ab7b795d0bf2592720d3544ff7adec92c000c20/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/pzuhr3zw6ximyulw/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/pyr7rffvymhdmfyf/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/djwut6r5cs4go5uv/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/0c38f4ce8338543a477b9619ba2c06a554f4e68f17f33cd51c8fa103eaa2c99b/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/c3815729c44eecd766631d174328951ce945dbd90f5296a752e5ae8e11e26ef8/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2a93a46d8633e8fee3e3ae9521929810e711964d4aae6542e38aca0ffec75e6e/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/346c3f0c5509dc4875050e26e1cb84f382ac9411a21312e5f8b04ea8d8e91b62/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4aebffa6fcb0f069e210d8de7e6b5eaf6bffa5c373b3d2651cc8bbe4551ad3d9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/bb194973aeffbbc1b43e21e3cee220699ab88c2c9f9c9353823a9df6bfb0558a/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/tfj3ojiigcya7mkj/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/7xlg6eq5xwvkxiik/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/49f2f1a7f3e0b56b4e774eea792cfd4a41c97f12a2bc417731ddf3c995e12e46/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/luoinozgqj3hq7b7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/eefikjypmvojfxrc/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b6e53647329b8d455abde83b017816a931f0c21aa2358e3476e26618a8507ab4/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/i3akmgiwkto3llj5/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a51e27bebec0d9b1fa2af0830349fd8f660de4df02e672fed4b5894305acc8da/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/lzkfyn3uhv4asxk2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/66008c97b8f08391ce54216eaa00928964c8808aa2fae171ced12716ba75ae0b/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5uqzoetcecaxq3pk/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4cb96bbe4c3236bc82c325ede97e057cb70c2bd2b0ee5fa3129f67e221aa2fb5/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/djddt7xvkpd46tms/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/42006237b2999c1c157044989e16355561632ca023b594856c5a034277ff2bdb/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a7965f41e4dc8b881c5fcbaf44e727839fe68b60396d44332a80730ed74f78be/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/bqsj22cfqeuarxcy/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/fhgbhxhkbtxj5xm7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ee5979d8d4fd6e55c1d127b39f4ddda55ec09ba2c7f54359fb6af4a2b0a14877/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3e5e3750e7d033d8f81357d6bbb4754dadc75e52f3f546b2f8bf922af0a365f4/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2itw3jmpeuha7ezv/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cfae809d18502cd220dca539c3d8ba015d0118052bfd0e6f83d074dfbac04f08/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/erti2ijoo7s4duoi/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2ee30392e6c733099504c13f95405f0e295a2fcb4077ca35f1469f94367834b0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/e37342ba2b704b9ef36f6ebf94fcaa700d87cbce816a912fd326b681a1b4fffe/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/0a3b90cc5a6c3be5fe9091d6ea1cd572ebd5765af32dee917d12b19d26d3e2f6/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/996edce22eb1daf97c6e8bd87dc9928c51bb4cff692e06818c32485aa6418e93/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cxqqv27tqvhgkygi/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/1c1438bd51daaa4e7583773627ef619d0184b433b33eda579deae29aa4dea8e0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/47396a6a09d20c3b4efe6f874fc6092edbf0de01402a45b002b8f3ffa3cc9302/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/75728f8cb10f35fe92e31e51781425eec2c43aa657d2e19e9cefabe0db2707e0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/073a06e0d34286f50f649ded827e58eb9907178d55fb5f34d23aa50ab243dce9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/exqii5r2ertl324t/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/18b6a475596ecc56a1850f1883a716765f377d3eb078a0f2777efa8bf2462721/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/586ac7c8de776198ed4ba4bc26413495e572adefc3e8a761ff84942be59a18e5/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/f0101381dd3137e14930540640c56f134aa31331d2c421ccb1cbb269195545ec/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/d9ee52ac64c0008a300928133726817bdd3bc7784da499769065ec66568ebf75/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/r373jfpcttyw5qun/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/drxvi7gqkjs5z6fr/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/4c0d8eb53e586d73caf5b6c7e09db61ebb586b07ecfed287ee960ee4e7927140/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/mmt325jliq4hubs4/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/818b02c41f6940021d2590fa074414a2ce534c13d409004573a44ba0e60e8ab7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/oz5arsehxrqhhsuo/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cabdb0ab1a5fc4546e3287a4925012fbbaf9fdfede9f03195515a554ba7814b2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/8759ff2a3879304cd32c48caa8f4dedc126432cd1a3c3b22ea9d7dc4c399db5f/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/xadazmqi7dtp5pha/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/61cfc955b29facc0309cbc3a2755fc3386b759d5a2349e94e92d9a99defb70ac/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/21a7c9efe8d0feb97e45c45dd208ddc6d043c81d7aa0a8e39fb9dadd26a1d721/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/0154f1ef63ca28de2b41720e2730a7e95ca3016ddc850632d48840b25750a272/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/qkrhnbre4jrm5f22/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/rkpp4zcgv53quzaa/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/nb7ereostg75aio3/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/8440a87c91fb172fde739771be32b34632f18e1a70106b3655ef811ef090d179/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b1627e1c706e9a64a0c450c9bc498d5fe6b400eb383ab8299bb9d8d18a7843df/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/sa7svb6l63ybxvku/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cext36ozjte5xexz/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/70ba5fc2ff6628f9de4b86fa0c262c6df2dbd949025ab9529dac355901a9d2e0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/6b8f0d16c5c5f2e3735980738c0bd13d5a51782c5daaa8698cda4284a5b157dd/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/250be8227d80ad5f41fc0a8b2cb24bc9280aa9306da92b774ac21c16af9083aa/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/sfsoi3his5zmxes7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/deb581076cd619478f2ac83fc9ff68818016bc3f6b24b44a6295cca563fe075c/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/0274c505e8000ad3f92669113e24b292166030512a6913df1c8a86ef3f0b7446/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/646c9eefda82e18315f20d3bfc7b52fd5c7ebaeb9a042db7a01e371dcf348543/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5486e8f6384046c8879f909b0db9c54ea2d5f0367eb51a0ca90e643e17c829a1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/73f88cb35f1046ca9a5ae7f42f0d51ea78803045a4018af52c8c068a865bc028/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/eeljap4jnaafgbys/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/eq7gov42b66gh3lg/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/gaasuy5g3k2gsnch/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/8c016f1ce5741afd1ffc1d58b854363670d1aa9422c1969f36ddeada250cf384/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ztsuoopkbgilhu3q/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/930bacf1666cff7eba7a8986643e2160fa73e3b4d220b1dbf151945c5a2d3d3b/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/17f963bc971005f93054eff80eee60259616ab0485779d42830ea3f37c4de578/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/995c7ee7d71f0bbf9a835887694327500285830bed2e563c5f89108c866109a9/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3895517fb0e3eaca371ace0de24a5a52b2a723495293971f3003c0dd5f4ad890/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/59b77dcf667d5ff90df3b9c7996f47c3dc941f87482d61f9adab8dd5436483b8/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/sq7wjpbq4yjsewhc/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/c644d3836227e6dd4202a76ddd61c9a29093fdc1622e3bbd457ff8c3f5e19da2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/9be90e59d75af3752e7d2f4bdfbdae9f2bd46b8b8f09cdaf6869414b4aa1e8bf/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/8484098f0784f98bd450565a93d8ff7b72593b0a5146c5b28f144e1ef783c64e/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/318f8229af5e5e32a0490a88e7e7b3d2e32ae231697597fbec08a02d67ce59e0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/cpjtdyujdejkdlvt/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/9f022b11cdee0a3dae3cc79b7995861c741d14971da7a04fdf622f3bd799c1cd/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a5g5barkd2qbuoxj/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/nysfbqymfps6eyml/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/fgvzp6kmz3yi5qut/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/051e6f9c13f53ef005a4919c47268b82ac6c8d5c1aa4aee6f0741f93c24124eb/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/9c7257f9573648edf49f876d64f3d2666704d4dc37eda391ae73964668967638/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/31fd7e3bb1e62738495cbb30d1d9fea6dff83f79983ac70dbed5d6df50e22a2b/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b01c8ad5a482634458a1fd223dd416f37549d32bf7627b69d4fd2d1f8b1a8081/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a9e93ff3d7632798d67714da8dbad2cbcf28a2f5808312105e70029f5990755b/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3d87cd27cae89d73132824a9189b0f15855f3201b8f1e85798d6d976deac52de/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/mtxobcikzpgyxjpn/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/94aee30ebe93e278462efc8199b7ec63cad7a6315d8ec6ed8303915a7ccc9211/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/xkbc3av3ppktnmjr/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b0b7d99b6ef4970ae744d0aef209fee7a2d39135fd9fbca2149ddac91c95215e/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/df155f71d4cde89a8ebf8bfc08218fe5ea913f869f29111e6d5d0a2b54f4233c/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/34f14f9358ffb190fcc14ca5b725a8147aa71e7af8101ddd8d271f04ce75a47a/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2cf56a03aee337f88d476c0588b162cecf792f1d3ea26f88d8662862b1fa1ed6/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/99422e1316a154babcaf602437aaf1c210ebba2be671a87ed7205a0856f67193/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ef82696a0e8d3b1f555dab692a83dea343b45b902b7d8bd7590af44ab6f8eab7/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/3fdxbkotu2tw3uni/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2c76846e388fbdb37ec785dbf3dc31868e1b4283e5ed670d6ce3e4de3690cc67/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/0c531c43e6ff109e7c942c7ec890d28549866eb5e8bfb9fc3f74d4b2aa8e3129/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ezk5cq4tx7vul473/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/07d27a13c7729991927109924342a29b8dd44b0a3616a90188b16c8dc8433eb0/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/eb331d6c919ee6c756d5dfd6583f6d2db0f40b8b7d7f349151bdd9d469a305a1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/b90f0967f4af400e79fb045aff3ebaa571ab6b6d9a3f86eba7b025339ac138af/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/7bd88e9c8bc59691836d3bd7547333cbf64f2e1ef3031632b629cd5eed72eac1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2ac8e4fa0f3839d8018315b25ff74f2dd9ee9f0dc168436c05adc504a4528840/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/803e320bdcf3f9ebc859bc8a04363937bd517dd4fe3d3c85c8d2d4316cf0fa72/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/370d1865003ccb246762c3473070094a093d589adb433eb04a47c6056929c673/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ecdc7f6323d432b4dbb7929c0c20b7fb40d10a43785aff10a07cf982c8cd7a72/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/ef39e04ee0523f22834c5da581c88c672dc49d1d95a9e8aba180d79c37997de1/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/9e7a066358c2b41dd12f750dd098c42c0e077f48354cb2c38717fbd3ae3147b2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/eedb7d287c7c37a903493f9940fba1364a53c653e9095f39d754950ca1d8aa6a/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/5c76bd94389111b176eb9878a1b69b81cf3fc38a26110f7b6063576c57bf96fd/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/dpr2d323cxxvafum/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/f2a14859930cfc5a980e5084fa2df59a08bbbc3f9241e9a970674a4741698eb2/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/c8f095b9c0db52e1c59cb92fa3a935923afb4002501b8add464c64ecfc426179/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/2uezjt3ubbypszil/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/6db0efae1f7d30eb14924a86811a23210dfa256e1dd320d726cf430a3f42e412/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/367bed2f4cfb0fcac1c4dae7ad503a975d7544804c069b459abc6ae4eb2907ed/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/a13a3e1c1bff2f0772afdc8272ad2e67009f147b8c7d02c8aefb37d5e7c92aae/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/1da2d7594a838615c6a26bf3514f9157ebe664c60b6326bed3bc1a0b0e331d78/60.jpg",
+    "https://storage.googleapis.com/images.pricecharting.com/9b0aa8d5050937ea86c76a644bc64d57f000dc49a844abb3b99cf204d6834979/60.jpg"
+]
+
+    // Convert /60.jpg to /1600.jpg
+    const highResUrls = urls.map(url => url.replace("/60.jpg", "/1600.jpg"));
+
+    // Render images into collage
+    const collageDiv = document.getElementById("collage");
+    collageDiv.innerHTML = highResUrls.map(
+      (url, idx) => `<img src="${url}" alt="Image ${idx + 1}">`
+    ).join("");
+  </script>
+</body>
+</html>
